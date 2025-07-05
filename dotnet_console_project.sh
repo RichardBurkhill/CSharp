@@ -1,3 +1,3 @@
-mkdir CSharp_Person
-cd CSharp_Person
+mkdir CSharp
+cd CSharp
 dotnet new console
