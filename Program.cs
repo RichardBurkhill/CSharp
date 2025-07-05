@@ -20,7 +20,8 @@ public class Person : IGreetable
     public DateTime BirthDate => _birthDate;
 
     // Computed property (expression-bodied member)
-    public int Age => DateTime.Now.Year - _birthDate.Year;
+    public int Age =>  DateTime.Today.Year - BirthDate.Year -
+                      (DateTime.Today < BirthDate.AddYears(DateTime.Today.Year - BirthDate.Year) ? 1 : 0);
 
     // Constructor
     public Person(string firstName, string lastName, DateTime birthDate)
@@ -65,7 +66,7 @@ public class Program
 {
     public static void Main()
     {
-        var employee = new Employee("Alice", "Smith", new DateTime(1992, 4, 10), "Software Engineer", 53000m);
+        var employee = new Employee("Richard", "Burkhill", new DateTime(1977, 11, 10), "Software Engineer", 53000m);
         Console.WriteLine(employee.Greet());
 
         // Static method usage
@@ -75,15 +76,15 @@ public class Program
         // LINQ example: list of records
         var tasks = new List<TaskItem>
         {
-            new("Learn C#", true),
-            new("Build a project", false),
+            new("Learn C#", false),
+            new("Build a project", true),
             new("Take a break", true)
         };
 
         var completedTasks = tasks.Where(t => t.IsCompleted)
                                   .Select(t => t.Description);
 
-        Console.WriteLine("✅ Completed tasks:");
+        Console.WriteLine("Completed tasks:");
         foreach (var task in completedTasks)
         {
             Console.WriteLine($" - {task}");
