@@ -18,10 +18,16 @@ public class Person : IGreetable
     // Read-only property with a backing field
     private readonly DateTime _birthDate;
     public DateTime BirthDate => _birthDate;
+    
+    private string ForEquals => FirstName + LastName + BirthDate.ToString();
 
     // Computed property (expression-bodied member)
-    public int Age =>  DateTime.Today.Year - BirthDate.Year -
+    public int Age => DateTime.Today.Year - BirthDate.Year -
                       (DateTime.Today < BirthDate.AddYears(DateTime.Today.Year - BirthDate.Year) ? 1 : 0);
+
+    public override bool Equals(object? obj) => obj is Person other && (ForEquals) == other.ForEquals;
+    public bool Equals(Person? other) => other is not null && ForEquals == other.ForEquals;
+    public override int GetHashCode() => ForEquals.GetHashCode();
 
     // Constructor
     public Person(string firstName, string lastName, DateTime birthDate)
