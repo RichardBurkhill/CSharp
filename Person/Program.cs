@@ -89,5 +89,7 @@ public class Program
         {
             Console.WriteLine($" - {task}");
         }
+
+        DataStructuresBenchmark.RunBenchmarks();
     }
 }
