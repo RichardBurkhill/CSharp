@@ -91,5 +91,6 @@ public class Program
         }
 
         DataStructuresBenchmark.RunBenchmarks();
+        LowLevelProgramming.RunDemonstration();
     }
 }
