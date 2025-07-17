@@ -1,69 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-// Interface declaration
-public interface IGreetable
-{
-    string Greet();
-}
-
-// Base class
-public class Person : IGreetable
-{
-    // Auto-implemented property with nullable reference type
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-
-    // Read-only property with a backing field
-    private readonly DateTime _birthDate;
-    public DateTime BirthDate => _birthDate;
-    
-    private string ForEquals => FirstName + LastName + BirthDate.ToString();
-
-    // Computed property (expression-bodied member)
-    public int Age => DateTime.Today.Year - BirthDate.Year -
-                      (DateTime.Today < BirthDate.AddYears(DateTime.Today.Year - BirthDate.Year) ? 1 : 0);
-
-    public override bool Equals(object? obj) => obj is Person other && (ForEquals) == other.ForEquals;
-    public bool Equals(Person? other) => other is not null && ForEquals == other.ForEquals;
-    public override int GetHashCode() => ForEquals.GetHashCode();
-
-    // Constructor
-    public Person(string firstName, string lastName, DateTime birthDate)
-    {
-        FirstName = firstName;
-        LastName = lastName;
-        _birthDate = birthDate;
-    }
-
-    // Method (instance)
-    public virtual string Greet() =>
-        $"Hello, I'm {FirstName} {LastName} and I'm {Age} years old.";
-
-    // Static method
-    public static Person CreateAnonymous() =>
-        new Person("John", "Doe", new DateTime(1990, 1, 1));
-}
-
-// Derived class with method overriding
-public class Employee : Person
-{
-    public string JobTitle { get; set; }
-    public decimal Salary { get; set; }
-
-    // Constructor chaining to base class
-    public Employee(string firstName, string lastName, DateTime birthDate, string jobTitle, decimal salary)
-        : base(firstName, lastName, birthDate)
-    {
-        JobTitle = jobTitle;
-        Salary = salary;
-    }
-
-    // Method override
-    public override string Greet() =>
-        $"{base.Greet()} I work as a {JobTitle} and earn {Salary:C}.";
-}
+using Microsoft.Data.Sqlite;
 
 // Record type (immutable data holder introduced in C# 9.0)
 public record TaskItem(string Description, bool IsCompleted);
@@ -72,31 +10,57 @@ public class Program
 {
     public static void Main()
     {
-        var employee = new Employee("Richard", "Burkhill", new DateTime(1977, 11, 10), "Software Engineer", 53000m);
-        Console.WriteLine(employee.Greet());
+        string dbPath = "CoronationStreet.db";
 
-        // Static method usage
+        // 1. Create DB & table if needed
+        Database.DatabaseInitialiser.InitializeDatabase(dbPath);
+
+        // 3. Read all employees
+        var employees = EmployeeModel.EmployeeRepository.GetAllEmployees(dbPath);
+
+        // 4. Greet
+        foreach (var emp in employees)
+        {
+            Console.WriteLine(emp.Greet());
+        }
+
+        var RichardBurkhill = new EmployeeModel.Employee("Richard", "Burkhill", new DateTime(1977, 11, 5), "Software Engineer", 53000m, "RichardBurkhill4@gmail.com");
+        var LizMcDonald = new EmployeeModel.Employee("Liz", "McDonald", new DateTime(1963, 6, 15), "Bar Manager", 30000m, "Liz@CoronationStreet.co.uk");
+        var SteveMcDonald = new EmployeeModel.Employee("Steve", "McDonald", new DateTime(1975, 3, 20), "Owner Street Cars, Owner Rovers Return", 80000m, "Steve@CoronationStreet.co.uk");
+        var DannyBaldwin = new EmployeeModel.Employee("Danny", "Baldwin", new DateTime(1970, 1, 1), "Owner Underworld", 100_000m, "Danny@CoronationStreet.co.uk");
+        var FrankieBaldwin = new EmployeeModel.Employee("Frankie", "Baldwin", new DateTime(1970, 5, 10), "Waitress Roy's Rolls", 12000m, "Frankie@CoronationStreet.co.uk");
+        var VeraDuckworth = new EmployeeModel.Employee("Vera", "Duckworth", new DateTime(1940, 2, 20), "Waitress Roy's Rolls", 14000m, "Vera@CoronationStreet.co.uk");
+        var employeeList = new List<EmployeeModel.Employee> { RichardBurkhill, LizMcDonald, SteveMcDonald, DannyBaldwin, FrankieBaldwin, VeraDuckworth };
+
+        //Write out employees to SQLite database
+        foreach (var emp in employeeList)
+        {
+            emp.SaveToDatabase(dbPath);
+        }
+        // 5. National Insurance Calculation
+
+            // Static method usage
         var anon = Person.CreateAnonymous();
-        Console.WriteLine(anon.Greet());
+            Console.WriteLine(anon.Greet());
 
-        // LINQ example: list of records
-        var tasks = new List<TaskItem>
+            // LINQ example: list of records
+            var tasks = new List<TaskItem>
         {
             new("Learn C#", false),
             new("Build a project", true),
             new("Take a break", true)
         };
 
-        var completedTasks = tasks.Where(t => t.IsCompleted)
-                                  .Select(t => t.Description);
+            var completedTasks = tasks.Where(t => t.IsCompleted)
+                                      .Select(t => t.Description);
 
-        Console.WriteLine("Completed tasks:");
-        foreach (var task in completedTasks)
-        {
-            Console.WriteLine($" - {task}");
+            Console.WriteLine("Completed tasks:");
+            foreach (var task in completedTasks)
+            {
+                Console.WriteLine($" - {task}");
+            }
+
+            DataStructuresBenchmark.RunBenchmarks();
+            LowLevelProgramming.RunDemonstration();
         }
-
-        DataStructuresBenchmark.RunBenchmarks();
-        LowLevelProgramming.RunDemonstration();
     }
-}
