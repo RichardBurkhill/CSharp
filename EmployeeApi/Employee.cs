@@ -1,59 +1,27 @@
-using System;
-using Microsoft.Data.Sqlite;
+using System.ComponentModel.DataAnnotations;
 
-namespace EmployeeModel
+namespace EmployeeApi.Models
 {
-    // Derived class with method overriding
-    public class Employee : Person
+    public class Employee
     {
-        public string JobTitle { get; set; }
+        [Required]
+        public string FirstName { get; set; } = string.Empty;
+        [Required]
+        public string LastName { get; set; } = string.Empty;
+        [Required]
+        public DateTime BirthDate { get; set; }
+        [Required]
+        [EmailAddress]
+        [StringLength(100, ErrorMessage = "Email length can't be more than 100 characters.")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; } = string.Empty;
+        [Required]
+        [StringLength(50, ErrorMessage = "Job title length can't be more than 50 characters.")]
+        [RegularExpression(@"^[A-Z][a-z]+(?:\s[A-Z][a-z]+)*$", ErrorMessage = "Job title must start with a capital letter and contain only letters and spaces.")]
+        public string JobTitle { get; set; } = string.Empty;
+        [Required]
+        [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number.")]
+        [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Salary must be a valid decimal number with up to two decimal places.")]
         public decimal Salary { get; set; }
-        public string Email { get; set; }
-
-        // Constructor chaining to base class
-        public Employee(string firstName, string lastName, DateTime birthDate, string jobTitle, decimal salary, string email)
-            : base(firstName, lastName, birthDate, email)
-        {
-            JobTitle = jobTitle;
-            Salary = salary;
-            Email = email;
-        }
-
-        // Save to SQLite database
-        public void SaveToDatabase(string dbPath)
-        {
-            using var connection = new SqliteConnection($"Data Source={dbPath}");
-            connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = @"
-                    INSERT INTO Employees (FirstName, LastName, BirthDate, JobTitle, Salary, Email)
-                    VALUES ($firstName, $lastName, $birthDate, $jobTitle, $salary, $email);
-                ";
-
-            command.Parameters.AddWithValue("$firstName", FirstName ?? string.Empty);
-            command.Parameters.AddWithValue("$lastName", LastName ?? string.Empty);
-            command.Parameters.AddWithValue("$birthDate", BirthDate.ToString("yyyy-MM-dd"));
-            command.Parameters.AddWithValue("$jobTitle", JobTitle ?? string.Empty);
-            command.Parameters.AddWithValue("$salary", Salary);
-            command.Parameters.AddWithValue("$email", EmailAddress ?? string.Empty);
-
-            command.ExecuteNonQuery();
-        }
-
-        // Method override
-        public override string Greet() =>
-            $"{base.Greet()} I work as a {JobTitle} and earn {Salary:C}.";
-
-        // Calculate National Insurance contributions
-        public (decimal employeeNi, decimal employerNi) CalculateNationalInsurance()
-        {
-            return EmployeeModel.NICalculator.Calculate(Salary);
-        }
-        // Calculate tax
-        public decimal CalculateTax()
-        {
-            return EmployeeModel.IncomeTaxCalculator.CalculateIncomeTax(Salary);
-        }
     }
 }

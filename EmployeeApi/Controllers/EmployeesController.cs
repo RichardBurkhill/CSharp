@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using EmployeeApi.Models;
 using EmployeeApi.Services;
 
 namespace EmployeeApi.Controllers
@@ -7,28 +8,20 @@ namespace EmployeeApi.Controllers
     [Route("api/[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly EmployeeService _service;
+        private static readonly List<Employee> _employees = new();
 
-        public EmployeesController(EmployeeService service)
+        [HttpGet("{email}")]
+        public ActionResult<Employee> Get(string email)
         {
-            _service = service;
-        }
-
-        [HttpGet]
-        public ActionResult<List<EmployeeModel.Employee>> GetAll() => _service.GetAll();
-
-        [HttpGet("{id}")]
-        public ActionResult<EmployeeModel.Employee> Get(string email)
-        {
-            var employee = _service.GetByEmail(email);
-            return employee is null ? NotFound() : employee;
+            var employee = _employees.FirstOrDefault(e => e.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            return employee is not null ? Ok(employee) : NotFound();
         }
 
         [HttpPost]
-        public ActionResult<EmployeeModel.Employee> Create(EmployeeModel.Employee employee)
+        public ActionResult<Employee> Post(Employee employee)
         {
-            var created = _service.Add(employee);
-            return CreatedAtAction(nameof(Get), new { email = created.Email }, created);
+            _employees.Add(employee);
+            return CreatedAtAction(nameof(Get), new { email = employee.Email }, employee);
         }
     }
 }
