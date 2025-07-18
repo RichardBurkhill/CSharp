@@ -1,0 +1,62 @@
+# .NET build and runtime artifacts
+bin/
+obj/
+out/
+*.user
+*.suo
+
+# Rider and VS Code settings
+.idea/
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# ASP.NET Core specific
+wwwroot/dist/
+wwwroot/node_modules/
+appsettings.*.json
+
+# Logs
+*.log
+
+# User secrets (if used)
+**/secrets.json
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# npm / node if present
+node_modules/
+
+# dotnet tools
+.tools/
+
+# Global JSON, if overridden locally
+global.json
+
+# Auto-generated files
+*.generated.cs
+
+# SQLite or local dev databases
+*.db
+*.sqlite
+
+# Environment configs
+.env
+.env.*
+
+# JetBrains Rider
+*.DotSettings.user
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# VS for Mac
+.vscode/
+MonoDevelop/
+
