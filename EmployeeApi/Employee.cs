@@ -4,6 +4,7 @@ namespace EmployeeApi.Models
 {
     public class Employee
     {
+        public int Id { get; set; }  // EF Core primary key
         [Required]
         public string FirstName { get; set; } = string.Empty;
         [Required]

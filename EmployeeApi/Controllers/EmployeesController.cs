@@ -18,17 +18,23 @@ namespace EmployeeApi.Controllers
         // This is a common pattern in ASP.NET Core to keep controllers clean and focused on handling
         // HTTP requests rather than managing dependencies directly.
         // And the DI container resolves that dependency automatically at runtime.
-        private readonly EmployeeService _employeeService;
-        public EmployeesController(EmployeeService employeeService)
+        private readonly IEmployeeService _employeeService;
+        public EmployeesController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
         }
 
         // HTTP GET api/employees
         [HttpGet("{email}")]
-        public ActionResult<Employee> Get(string email)
+        public async Task<ActionResult<Employee>> Get(string email)
         {
-            var employee = _employeeService.GetByEmail(email);
+            var employee = await _employeeService.GetByEmailAAsync(email);
+            // If the employee is found, return it with a 200 OK response.
+            // If not found, return a 404 Not Found response.
+            // This is a common pattern in REST APIs to provide clear feedback to clients.
+            // The ActionResult<Employee> return type allows you to return different HTTP status codes
+            // and the Employee object when successful.
+            // The email parameter is automatically bound from the route.
             return employee is not null ? Ok(employee) : NotFound();
         }
 
@@ -54,9 +60,9 @@ namespace EmployeeApi.Controllers
         // The CreatedAtAction method takes the name of the action (Get) and the route values (email) to generate the URI.
         // The CreatedAtAction method also takes the created employee object as the third parameter to include it in the response body.
         [HttpPost]
-        public ActionResult<Employee> Post(Employee employee)
+        public async Task<ActionResult<Employee>> Post(Employee employee)
         {
-            var created = _employeeService.Add(employee);
+            var created = await _employeeService.AddAsync(employee);
             return CreatedAtAction(nameof(Get), new { email = created.Email }, created);
         }
     }

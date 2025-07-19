@@ -1,10 +1,15 @@
-using EmployeeApi.Services;
 
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // 🏗️ Step 1: Add services to the dependency injection container.
 // This is where you register services your app will use. These can be framework services
 // (like controllers, logging, database contexts) or your own custom services.
+
+// Connection string for SQLite database file in project folder
+var connectionString = builder.Configuration.GetConnectionString("EmployeeDatabase") ?? "Data Source=employees.db";
+builder.Services.AddDbContext<EmployeeApi.Data.EmployeeContext>(options =>
+    options.UseSqlite(connectionString));
 
 builder.Services.AddControllers(); 
 // 👆 This tells ASP.NET Core to use the built-in controller system for routing HTTP requests.
@@ -17,10 +22,8 @@ builder.Services.AddSwaggerGen();
 // at /swagger when running locally.
 
 //Whenever something needs an EmployeeService, here’s how to supply it.
-builder.Services.AddSingleton<EmployeeService>();
-// 👆 This registers your custom EmployeeService as a singleton.
-// Singleton means the same instance is reused throughout the lifetime of the app.
-// It's perfect for simple in-memory storage like your `_employees` list.
+builder.Services.AddScoped<EmployeeApi.Services.EmployeeService>();
+// 👆 Registers the EmployeeService as a scoped service, meaning a new instance is created for each request.
 
 var app = builder.Build();
 // 🏗️ Step 2: Build the app. This creates an instance of the app based on the configuration you've provided.
