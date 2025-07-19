@@ -12,10 +12,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); 
 // 👆 Enables minimal API metadata (used by tools like Swagger for describing your API endpoints)
 
-builder.Services.AddSwaggerGen(); 
+builder.Services.AddSwaggerGen();
 // 👆 Adds Swagger/OpenAPI generation. This allows you to visualize and test your API in the browser
 // at /swagger when running locally.
 
+//Whenever something needs an EmployeeService, here’s how to supply it.
 builder.Services.AddSingleton<EmployeeService>();
 // 👆 This registers your custom EmployeeService as a singleton.
 // Singleton means the same instance is reused throughout the lifetime of the app.
