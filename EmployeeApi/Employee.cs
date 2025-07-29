@@ -2,11 +2,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeApi.Models
 {
-    public class Employee
+    public class Employee : IComparable<Employee>
     {
         public int Id { get; set; }  // EF Core primary key
         [Required]
         public string FirstName { get; set; } = string.Empty;
+
+        public int CompareTo(Employee? other)
+        {
+            if (other == null) return 1;
+
+            // Compare employees by Age (older employees come first)
+            int ageThis = (int)((DateTime.Now - BirthDate).TotalDays / 365.25);
+            int ageOther = (int)((DateTime.Now - other.BirthDate).TotalDays / 365.25);
+            int ageComparison = ageOther.CompareTo(ageThis);
+            if (ageComparison != 0) return ageComparison;
+            return Id.CompareTo(other.Id);
+        }
+
         [Required]
         public string LastName { get; set; } = string.Empty;
         [Required]
