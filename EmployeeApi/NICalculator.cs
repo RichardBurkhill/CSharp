@@ -1,6 +1,6 @@
 using System;
 
-namespace EmployeeModel
+namespace EmployeeApi.Models
 {
     public static class NICalculator
     {

@@ -37,5 +37,9 @@ namespace EmployeeApi.Models
         [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number.")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Salary must be a valid decimal number with up to two decimal places.")]
         public decimal Salary { get; set; }
+        [Required]
+        [Range(0, 10, ErrorMessage = "Pension contribution must be a percentage between 0 and 10.")]
+        [RegularExpression(@"^(10(\.00?)?|[0-9](\.\d{1,2})?)$", ErrorMessage = "Pension contribution must be a percentage between 0 and 10 with up to two decimal places.")]
+        public decimal PensionContribution { get; set; } // Percentage of salary contributed to pension
     }
 }
